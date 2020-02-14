@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "lodash": "^4.17.15",
     "suncalc": "^1.8.0"
   }
 }
