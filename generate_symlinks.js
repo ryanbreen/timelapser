@@ -1,3 +1,4 @@
+const { spawn } = require('child_process');
 const fs = require('fs')
 const util = require('util')
 
@@ -11,6 +12,7 @@ const readdir = util.promisify(fs.readdir)
 
 // NOTE: Local time on machine is UTC
 
+const progress = require('progress')
 const suncalc = require('suncalc')
 
 const today = new Date()
@@ -32,13 +34,11 @@ const lastSunset = yesterdaySun.sunset.getTime()
 //const before = sunrise - 30 * 60 * 1000
 //const after = sunset + 30 * 60 * 1000
 
-const before = todaySun.solarNoon.getTime()
-const after = sunset + 60 * 60 * 1000
+//const before = todaySun.solarNoon.getTime()
+//const after = sunset + 60 * 60 * 1000
 
-//const before = sunrise - (30 * 60 * 1000)
-//const after = sunrise + (180 * 60 * 1000)
-
-//console.log('Sunrise today is %s, so looking for times between %s and %s', sunrise, before, after)
+const before = sunrise - (30 * 60 * 1000)
+const after = sunrise + (180 * 60 * 1000)
 
 const purgeOldFiles = async () => {
     const weekAgo = new Date()
@@ -75,7 +75,7 @@ const collectAllFiles = async () => {
         return before <= fileTime && fileTime <= after
     })
 
-    console.log("Found %s files between %s and %s", files.length, before, after)
+    console.log("Found %s files between %s and %s", files.length, new Date(before), new Date(after))
     
     files.forEach(async(file) => {
         try {
@@ -83,12 +83,34 @@ const collectAllFiles = async () => {
         } catch(e) {
         }
     })
+
+    return files.length
+}
+
+const produceVideo = async (frames, name) => {
+    
+    const produce = spawn('ffmpeg', ['-r','60','-pattern_type','glob','-i','*.png',`${name}.mp4`], { cwd: '/pool/view_data/temp/' })
+
+    let frameCounter = 0
+
+    const bar = new progress('  Converting [:bar] :percent :etas', { total: frames });
+
+    produce.stderr.on('data', data => {
+        const datar = data.toString()
+        
+        const match = datar.match(/frame=\s*([\d]*)\s*fps/)
+        if (match && match.length > 0) {
+            const frame = parseInt(match[1])
+            bar.update(frame / frames)
+        }
+    });
 }
 
 const run = async() => {
     // await purgeOldFiles()
 
-    await collectAllFiles()
+    const frames = await collectAllFiles()
+    await produceVideo(frames, "all_day")
 }
 
 run()
