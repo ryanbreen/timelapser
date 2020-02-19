@@ -28,8 +28,8 @@ const sunset = todaySun.sunset.getTime()
 const lastSunrise = yesterdaySun.sunrise.getTime()
 const lastSunset = yesterdaySun.sunset.getTime()
 
-//const before = lastSunset
-//const after = sunrise
+const before = lastSunset
+const after = sunrise
 
 //const before = sunrise - 30 * 60 * 1000
 //const after = sunset + 30 * 60 * 1000
@@ -37,8 +37,8 @@ const lastSunset = yesterdaySun.sunset.getTime()
 //const before = todaySun.solarNoon.getTime()
 //const after = sunset + 60 * 60 * 1000
 
-const before = sunrise - (30 * 60 * 1000)
-const after = sunrise + (180 * 60 * 1000)
+//const before = sunrise - (30 * 60 * 1000)
+//const after = sunrise + (180 * 60 * 1000)
 
 const purgeOldFiles = async () => {
     const weekAgo = new Date()
@@ -77,12 +77,12 @@ const collectAllFiles = async () => {
 
     console.log("Found %s files between %s and %s", files.length, new Date(before), new Date(after))
     
-    files.forEach(async(file) => {
+    for await(file of files) {
         try {
             await ln_s(`/pool/view_data/${file}`, `/pool/view_data/temp/${file}`)
         } catch(e) {
         }
-    })
+    }
 
     return files.length
 }
@@ -104,6 +104,12 @@ const produceVideo = async (frames, name) => {
             bar.update(frame / frames)
         }
     });
+
+    const exitCode = await new Promise( (resolve, reject) => {
+        produce.on('close', resolve);
+    });
+
+    console.log('FFMPEg completed with %s', exitCode)
 }
 
 const run = async() => {
