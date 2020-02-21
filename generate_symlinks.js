@@ -28,8 +28,8 @@ const sunset = todaySun.sunset.getTime()
 const lastSunrise = yesterdaySun.sunrise.getTime()
 const lastSunset = yesterdaySun.sunset.getTime()
 
-const before = lastSunset
-const after = sunrise
+//const before = lastSunset
+//const after = sunrise
 
 //const before = sunrise - 30 * 60 * 1000
 //const after = sunset + 30 * 60 * 1000
@@ -37,8 +37,8 @@ const after = sunrise
 //const before = todaySun.solarNoon.getTime()
 //const after = sunset + 60 * 60 * 1000
 
-//const before = sunrise - (30 * 60 * 1000)
-//const after = sunrise + (180 * 60 * 1000)
+const before = sunrise - (240 * 60 * 1000)
+const after = sunrise + (180 * 60 * 1000)
 
 const purgeOldFiles = async () => {
     const weekAgo = new Date()
@@ -116,7 +116,7 @@ const run = async() => {
     // await purgeOldFiles()
 
     const frames = await collectAllFiles()
-    await produceVideo(frames, "all_day")
+    await produceVideo(frames, "early_morning")
 }
 
 run()
