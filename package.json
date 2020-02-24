@@ -12,6 +12,7 @@
     "dateformat": "^3.0.3",
     "lodash": "^4.17.15",
     "progress": "^2.0.3",
+    "single-line-log": "^1.1.2",
     "suncalc": "^1.8.0"
   }
 }
